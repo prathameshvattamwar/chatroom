@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatroom</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="chatroom-container">
+        <!-- Chat Area -->
+        <div class="chat-area">
+            <div class="messages" id="messages">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="message {% if message.username == session['username'] %}user-message{% endif %}">
+                            <div class="message-header">
+                                <!-- Use user's profile image if available, otherwise use default avatar -->
+                                <img src="{{ url_for('static', filename=message.profile_image if message.profile_image else 'img/avatar.png') }}" alt="Profile" class="profile-img">
+                                <div class="message-info">
+                                    <strong class="username">{{ message.username }}</strong>
+                                    <p class="message-content">{{ message.content }}</p>
+                                    <p class="timestamp">{{ message.timestamp.strftime('%Y-%m-%d %H:%M') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            {% if 'username' in session %}
+            <form method="POST" action="{{ url_for('send_message') }}" class="send-message-form">
+                <input type="text" name="message" placeholder="Type here..." required autocomplete="off">
+                <button type="submit"><i class="fas fa-paper-plane"></i></button>
+            </form>
+            <a href="{{ url_for('logout') }}" class="logoutBtn" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></a>
+            {% else %}
+            <p>You need to <a href="#" onclick="openModal('authModal')">Login/Signup</a> to chat</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Modal for Authentication (Login/Signup combined) -->
+    <div class="modal" id="authModal">
+        <div class="modal-content auth-content">
+            <span class="close" onclick="closeModal('authModal')">&times;</span>
+            <div class="auth-toggle">
+                <button id="loginBtn" onclick="toggleAuth('login')">Login</button>
+                <button id="signupBtn" onclick="toggleAuth('signup')">Signup</button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="loginForm" class="auth-form active">
+                <h1>Login</h1>
+                <form id="loginFormElement">
+                    <input type="text" id="loginUsername" name="username" placeholder="Username" required autocomplete="off">
+                    <input type="password" id="loginPassword" name="password" placeholder="Password" required autocomplete="off">
+                    <small class="error-msg" id="loginUsernameError"></small>
+                    <button type="submit">Login</button>
+                </form>
+                <p>Don't have an account? <a href="#" onclick="toggleAuth('signup')">Signup here</a></p>
+            </div>
+
+            <!-- Signup Form with additional fields -->
+            <div id="signupForm" class="auth-form">
+                <h1>Signup</h1>
+                <form id="signupFormElement" enctype="multipart/form-data">
+                    <input type="text" id="signupUsername" name="username" placeholder="Username" required autocomplete="off">
+                    <small class="error-msg" id="signupUsernameError"></small>
+                    <input type="email" id="signupEmail" name="email" placeholder="Email" required autocomplete="off">
+                    <small class="error-msg" id="signupEmailError"></small>
+                    <input type="password" id="signupPassword" name="password" placeholder="Password" required autocomplete="off">
+                    <small class="error-msg" id="signupPasswordError"></small>
+                    <input type="password" id="signupConfirmPassword" name="confirm_password" placeholder="Confirm Password" required autocomplete="off">
+                    <small class="error-msg" id="signupConfirmPasswordError"></small>
+                    <!-- File input for profile image -->
+                    <input type="file" id="signupProfileImage" name="profile_image" accept="image/*">
+                    <small class="error-msg" id="signupProfileImageError"></small>
+                    <button type="submit">Signup</button>
+                </form>
+                <p>Already have an account? <a href="#" onclick="toggleAuth('login')">Login here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
