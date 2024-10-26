@@ -1,3 +1,36 @@
+let messageToDelete = null;
+
+// Function to show confirmation modal
+function confirmDelete(messageId) {
+    messageToDelete = messageId;
+    document.getElementById('confirmDeleteModal').style.display = 'flex';
+}
+
+// Function to close the confirmation modal
+function closeDeleteModal() {
+    messageToDelete = null;
+    document.getElementById('confirmDeleteModal').style.display = 'none';
+}
+
+// Add event listeners for the delete confirmation buttons
+document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+    if (messageToDelete) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/delete_message/' + messageToDelete, true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                window.location.reload();  // Reload page after successful deletion
+            }
+        };
+        xhr.send();
+    }
+    closeDeleteModal();  // Close modal after deletion
+});
+
+document.getElementById('cancelDeleteBtn').addEventListener('click', closeDeleteModal);
+
+
 // Function to open a modal
 function openModal(modalId) {
     document.getElementById(modalId).style.display = 'flex';

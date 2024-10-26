@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,25 +9,35 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
+
 <body>
     <div class="chatroom-container">
         <!-- Chat Area -->
         <div class="chat-area">
             <div class="messages" id="messages">
+                
                 {% if messages %}
-                    {% for message in messages %}
-                        <div class="message {% if message.username == session['username'] %}user-message{% endif %}">
-                            <div class="message-header">
-                                <!-- Use user's profile image if available, otherwise use default avatar -->
-                                <img src="{{ url_for('static', filename=message.profile_image if message.profile_image else 'img/avatar.png') }}" alt="Profile" class="profile-img">
-                                <div class="message-info">
-                                    <strong class="username">{{ message.username }}</strong>
-                                    <p class="message-content">{{ message.content }}</p>
-                                    <p class="timestamp">{{ message.timestamp.strftime('%Y-%m-%d %H:%M') }}</p>
-                                </div>
-                            </div>
+                {% for message in messages %}
+                <div class="message {% if message.username == session['username'] %}user-message{% endif %}">
+                    <!-- Show delete button only for the message owner -->
+                    {% if message.username == session['username'] %}
+                    <button class="delete-btn" onclick="confirmDelete({{ message.id }})" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    {% endif %}
+                    <div class="message-header">
+                        <!-- Use user's profile image if available, otherwise use default avatar -->
+                        <img src="{{ url_for('static', filename=message.profile_image if message.profile_image else 'img/avatar.png') }}"
+                            alt="Profile" class="profile-img">
+                        <div class="message-info">
+                            <strong class="username">{{ message.username }}</strong>
+                            <p class="message-content">{{ message.content }}</p>
+                            <p class="timestamp">{{ message.timestamp.strftime('%Y-%m-%d %H:%M') }}</p>
                         </div>
-                    {% endfor %}
+                        
+                    </div>
+                </div>
+                {% endfor %}
                 {% endif %}
             </div>
 
@@ -35,10 +46,20 @@
                 <input type="text" name="message" placeholder="Type here..." required autocomplete="off">
                 <button type="submit"><i class="fas fa-paper-plane"></i></button>
             </form>
-            <a href="{{ url_for('logout') }}" class="logoutBtn" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></a>
+            <a href="{{ url_for('logout') }}" class="logoutBtn" title="Logout"><i
+                    class="fa-solid fa-right-from-bracket"></i></a>
             {% else %}
             <p>You need to <a href="#" onclick="openModal('authModal')">Login/Signup</a> to chat</p>
             {% endif %}
+        </div>
+    </div>
+
+    <!-- Modal for confirming message deletion -->
+    <div id="confirmDeleteModal" class="modal">
+        <div class="modal-content">
+            <p>Are you sure you want to delete this message forever?</p>
+            <button id="confirmDeleteBtn">Yes</button>
+            <button id="cancelDeleteBtn">No</button>
         </div>
     </div>
 
@@ -55,8 +76,10 @@
             <div id="loginForm" class="auth-form active">
                 <h1>Login</h1>
                 <form id="loginFormElement">
-                    <input type="text" id="loginUsername" name="username" placeholder="Username" required autocomplete="off">
-                    <input type="password" id="loginPassword" name="password" placeholder="Password" required autocomplete="off">
+                    <input type="text" id="loginUsername" name="username" placeholder="Username" required
+                        autocomplete="off">
+                    <input type="password" id="loginPassword" name="password" placeholder="Password" required
+                        autocomplete="off">
                     <small class="error-msg" id="loginUsernameError"></small>
                     <button type="submit">Login</button>
                 </form>
@@ -67,13 +90,16 @@
             <div id="signupForm" class="auth-form">
                 <h1>Signup</h1>
                 <form id="signupFormElement" enctype="multipart/form-data">
-                    <input type="text" id="signupUsername" name="username" placeholder="Username" required autocomplete="off">
+                    <input type="text" id="signupUsername" name="username" placeholder="Username" required
+                        autocomplete="off">
                     <small class="error-msg" id="signupUsernameError"></small>
                     <input type="email" id="signupEmail" name="email" placeholder="Email" required autocomplete="off">
                     <small class="error-msg" id="signupEmailError"></small>
-                    <input type="password" id="signupPassword" name="password" placeholder="Password" required autocomplete="off">
+                    <input type="password" id="signupPassword" name="password" placeholder="Password" required
+                        autocomplete="off">
                     <small class="error-msg" id="signupPasswordError"></small>
-                    <input type="password" id="signupConfirmPassword" name="confirm_password" placeholder="Confirm Password" required autocomplete="off">
+                    <input type="password" id="signupConfirmPassword" name="confirm_password"
+                        placeholder="Confirm Password" required autocomplete="off">
                     <small class="error-msg" id="signupConfirmPasswordError"></small>
                     <!-- File input for profile image -->
                     <input type="file" id="signupProfileImage" name="profile_image" accept="image/*">
@@ -87,4 +113,5 @@
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
+
 </html>

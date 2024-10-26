@@ -14,4 +14,4 @@ class Message(db.Model):
     username = db.Column(db.String(80), nullable=False)
     content = db.Column(db.String(200), nullable=False)
     timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
-    profile_image = db.Column(db.String(200), nullable=True)  # Store profile image with the message
+    profile_image = db.Column(db.String(200), nullable=True)

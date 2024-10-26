@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from models import db, User, Message
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import SQLAlchemyError
@@ -100,6 +100,23 @@ def send_message():
         db.session.add(new_message)
         db.session.commit()
     return redirect(url_for('index'))
+
+# Delete Message Route
+@app.route('/delete_message/<int:message_id>', methods=['POST'])
+def delete_message(message_id):
+    if 'username' not in session:
+        return jsonify({"error": "Unauthorized"}), 403
+
+    message = Message.query.get(message_id)
+    if message and message.username == session['username']:
+        try:
+            db.session.delete(message)
+            db.session.commit()
+            return jsonify({"success": True}), 200
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            return jsonify({"error": "Database error"}), 500
+    return jsonify({"error": "Message not found or unauthorized"}), 404
 
 if __name__ == '__main__':
     app.run(debug=True)
